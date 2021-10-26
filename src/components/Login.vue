@@ -86,6 +86,7 @@ export default {
 
 <style scoped>
 .login-body {
+  height: 100%;
   display: flex;
   background-color: #2b4b6b;
   justify-content: center;
