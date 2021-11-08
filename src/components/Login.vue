@@ -70,6 +70,7 @@ export default {
             "login",
             this.userLoginInfo
           );
+          // console.log(res);
           if (res.meta.status !== 200) {
             alert("登陆失败");
           } else {

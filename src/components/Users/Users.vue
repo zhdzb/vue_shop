@@ -156,6 +156,32 @@
         <el-button type="primary" @click="submitEditUserData">提 交</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色区域 -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="setRoleVisible"
+      @close="setRoleDialogClosed"
+      width="30%"
+    >
+      <p>当前用户：{{ curUserInfo.username }}</p>
+      <p>当前角色：{{ curUserInfo.role_name }}</p>
+      <p>分配新角色:</p>
+      <!-- 角色列表 -->
+      <el-select v-model="checkedRole" placeholder="请选择角色">
+        <el-option
+          v-for="item in roleList"
+          :key="item.id"
+          :label="item.roleName"
+          :value="item.id"
+        >
+        </el-option>
+      </el-select>
+      <!-- *** -->
+      <span slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitRoleData">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -199,6 +225,8 @@ export default {
       addUserDalogVisible: false,
       //修改弹窗开关
       editUserDalogVisible: false,
+      //分配角色弹窗开关
+      setRoleVisible: false,
       //添加用户
       addUserForm: {
         username: "test",
@@ -206,6 +234,10 @@ export default {
         email: "591893517@qq.com",
         mobile: "13402804094",
       },
+      //角色列表
+      roleList: [],
+      //已选择角色id
+      checkedRole: "",
       //添加用户表单规则
       addUserFormRules: {
         username: [
@@ -249,6 +281,8 @@ export default {
           { validator: validataMobile, triggle: ["blur", "change"] },
         ],
       },
+      //当前编辑用户信息
+      curUserInfo: {},
     };
   },
   methods: {
@@ -371,6 +405,41 @@ export default {
       //改变完从第一页显示
       this.queryUsersData.pagenum = 1;
       this.getUsersData();
+    },
+    //分配角色
+    async setRole(userInfo) {
+      this.setRoleVisible = true;
+      //记录当前用户信息
+      this.curUserInfo = userInfo;
+      //获取角色列表
+      const { data: roleRes } = await this.$http.get("roles");
+      this.roleList = roleRes.data;
+    },
+    //提交已分配角色数据
+    async submitRoleData() {
+      const { data: res } = await this.$http.put(
+        `users/${this.curUserInfo.id}/role`,
+        {
+          rid: this.checkedRole,
+        }
+      );
+      // console.log(res);
+      if (res.meta.status !== 200) {
+        return this.$message.error("分配角色失败");
+      }
+      this.$message.success("分配角色成功");
+      //关闭弹窗
+      this.setRoleVisible = false;
+
+      //刷新数据
+      this.getUsersData();
+    },
+    //监听分配角色弹窗关闭
+    setRoleDialogClosed() {
+      //清空当前用户信息
+      this.curUserInfo = {};
+      //清空当前角色列表
+      this.checkedRole = "";
     },
   },
 };
