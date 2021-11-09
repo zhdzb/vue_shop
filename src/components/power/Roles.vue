@@ -41,7 +41,7 @@
               <el-col :span="19">
                 <el-row
                   class="levelTwoRow"
-                  v-for="(level2, i2) in level1.children"
+                  v-for="level2 in level1.children"
                   :key="level2.id"
                 >
                   <el-col :span="6">
